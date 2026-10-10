@@ -6,9 +6,8 @@ import GoogleButton from "./GoogleButton";
 import { supabase } from "../lib/supabaseClient";
 
 export default function AuthForm({ mode }) {
-    const navigate = useNavigate();
   const isSignup = mode === "signup";
-
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [form, setForm] = useState({
@@ -23,23 +22,10 @@ export default function AuthForm({ mode }) {
     setMessage("");
   }
 
-  
-async function handleSubmit(event) {
-  event.preventDefault();
-  setMessage("");
+  function handleSubmit(event) {
+    event.preventDefault();
 
-  const email = form.email.trim();
-
-  // Check email format
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailPattern.test(email)) {
-    setMessage("Please enter a valid email address.");
-    return;
-  }
-
-  if (isSignup) {
-    if (form.password !== form.confirmPassword) {
+    if (isSignup && form.password !== form.confirmPassword) {
       setMessage("Your passwords do not match.");
       return;
     }
@@ -49,63 +35,11 @@ async function handleSubmit(event) {
       return;
     }
 
-    if (!/[A-Z]/.test(form.password)) {
-      setMessage("Include at least one uppercase letter (A–Z).");
-      return;
-    }
-
-    if (!/[a-z]/.test(form.password)) {
-      setMessage("Include at least one lowercase letter (a–z).");
-      return;
-    }
-
-    if (!/[0-9]/.test(form.password)) {
-      setMessage("Include at least one number (0–9).");
-      return;
-    }
-
-    if (!/[^A-Za-z0-9]/.test(form.password)) {
-      setMessage("Include at least one special character, such as ! or @.");
-      return;
-    }
+    // Authentication will be connected to Supabase in a later step.
+    setMessage(
+      "Your form is valid. Connect an authentication provider to create your account or sign in."
+    );
   }
-
-  try {
-    if (isSignup) {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password: form.password,
-        options: {
-          data: {
-            full_name: form.name.trim(),
-          },
-          emailRedirectTo: `${window.location.origin}/login`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.session) {
-        navigate("/dashboard");
-      } else {
-        setMessage(
-          "Account created! Check your email for a confirmation link before signing in."
-        );
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: form.password,
-      });
-
-      if (error) throw error;
-
-      navigate("/dashboard");
-    }
-  } catch (error) {
-    setMessage(error.message || "Authentication failed. Please try again.");
-  }
-}
 
   return (
     <div className="auth-card">
@@ -218,9 +152,7 @@ async function handleSubmit(event) {
             <button
               type="button"
               className="text-button"
-              onClick={() =>
-                setMessage("Password recovery will be enabled with Supabase Auth.")
-              }
+              onClick={() => navigate("/forgot-password")}
             >
               Forgot password?
             </button>
