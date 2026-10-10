@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Performance | Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #718096;
+      --border: #e7eaf2;
+      --primary: #5368e8;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    header {
+      padding: 25px 5%;
+      color: white;
+      background: #192447;
+    }
+
+    header h1 { margin: 0 0 8px; }
+    header p { margin: 0; color: #d4dcf7; }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    nav a { color: white; text-decoration: none; }
+
+    main {
+      width: min(1450px, 94%);
+      margin: 28px auto;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 28px 0 16px;
+    }
+
+    h2 { font-size: 20px; margin: 0; }
+    h3 { font-size: 16px; margin: 0 0 18px; }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card, .chart-card, .insight {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      min-width: 0;
+      box-shadow: 0 5px 20px #17203306;
+    }
+
+    .metric {
+      font-size: clamp(25px, 3vw, 34px);
+      font-weight: 750;
+      margin: 14px 0 8px;
+      letter-spacing: -1px;
+    }
+
+    .metric-caption { color: var(--muted); font-size: 12px; }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .chart-wrap {
+      height: 290px;
+      position: relative;
+    }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .insight h3 { margin-bottom: 10px; }
+    .insight p { color: #5c687d; line-height: 1.6; margin-bottom: 0; }
+
+    .status {
+      padding: 12px 15px;
+      border-radius: 10px;
+      background: #e8edff;
+      color: #3046a8;
+      margin-bottom: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th { color: var(--muted); font-weight: 600; }
+
+    footer {
+      margin: 30px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .insights { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .chart-grid { grid-template-columns: 1fr; }
+      .card, .chart-card { padding: 17px; }
+      header { padding: 22px 5%; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Student Performance Analytics</h1>
+  <p>Academic insights and historical performance overview</p>
+  <nav>
+    <a href="/">Prediction form</a>
+    <a href="/dashboard">Analytics</a>
+    <a href="/docs">API documentation</a>
+  </nav>
+</header>
+
+<main>
+  <div id="status" class="status" role="status">
+    Loading dataset analytics...
+  </div>
+
+  <div class="section-heading">
+    <h2>Performance overview</h2>
+    <span class="muted">Based on historical mathematics records</span>
+  </div>
+
+  <section class="cards">
+    <article class="card">
+      <div class="muted">Students analyzed</div>
+      <div class="metric" id="total">—</div>
+      <div class="metric-caption">Records in the dataset</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Average final grade</div>
+      <div class="metric" id="average">—</div>
+      <div class="metric-caption">Grade scale: 0–20</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Grades ≥ 10</div>
+      <div class="metric" id="passRate">—</div>
+      <div class="metric-caption">Share of historical records</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Grades below 10</div>
+      <div class="metric" id="below">—</div>
+      <div class="metric-caption">Records below the chosen threshold</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Median grade</div>
+      <div class="metric" id="median">—</div>
+      <div class="metric-caption">Middle value of final grades</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Highest grade</div>
+      <div class="metric" id="highest">—</div>
+      <div class="metric-caption">Highest recorded final grade</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Lowest grade</div>
+      <div class="metric" id="lowest">—</div>
+      <div class="metric-caption">Lowest recorded final grade</div>
+    </article>
+
+    <article class="card">
+      <div class="muted">Records with grade ≥ 10</div>
+      <div class="metric" id="aboveCount">—</div>
+      <div class="metric-caption">Count, not model accuracy</div>
+    </article>
+  </section>
+
+  <div class="section-heading">
+    <h2>Grade analysis</h2>
+    <span class="muted">Distribution and grade ranges</span>
+  </div>
+
+  <section class="chart-grid">
+    <article class="chart-card">
+      <h3>Final grade distribution</h3>
+      <div class="chart-wrap"><canvas id="gradeChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Grade category breakdown</h3>
+      <div class="chart-wrap"><canvas id="gradePie"></canvas></div>
+    </article>
+  </section>
+
+  <div class="section-heading">
+    <h2>Student demographics</h2>
+    <span class="muted">Who is represented in the dataset?</span>
+  </div>
+
+  <section class="chart-grid">
+    <article class="chart-card">
+      <h3>Gender distribution</h3>
+      <div class="chart-wrap"><canvas id="genderChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Students by school</h3>
+      <div class="chart-wrap"><canvas id="schoolChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Urban and rural addresses</h3>
+      <div class="chart-wrap"><canvas id="addressChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Extra school support</h3>
+      <div class="chart-wrap"><canvas id="supportChart"></canvas></div>
+    </article>
+  </section>
+
+  <div class="section-heading">
+    <h2>Academic factors</h2>
+    <span class="muted">Associations in the dataset, not proof of causation</span>
+  </div>
+
+  <section class="chart-grid">
+    <article class="chart-card">
+      <h3>Average grade by weekly study time</h3>
+      <div class="chart-wrap"><canvas id="studyChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Average grade by past class failures</h3>
+      <div class="chart-wrap"><canvas id="failureChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Mother's education vs average grade</h3>
+      <div class="chart-wrap"><canvas id="motherChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Father's education vs average grade</h3>
+      <div class="chart-wrap"><canvas id="fatherChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Average grade by absence range</h3>
+      <div class="chart-wrap"><canvas id="absenceChart"></canvas></div>
+    </article>
+    <article class="chart-card">
+      <h3>Absences vs final grade</h3>
+      <div class="chart-wrap"><canvas id="scatterChart"></canvas></div>
+    </article>
+  </section>
+
+  <div class="section-heading">
+    <h2>Detailed dataset statistics</h2>
+  </div>
+
+  <section class="chart-card table-wrap">
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>
+      </thead>
+      <tbody id="detailsTable"></tbody>
+    </table>
+  </section>
+
+  <div class="section-heading">
+    <h2>Insights to investigate</h2>
+  </div>
+
+  <section class="insights" id="insights">
+    <article class="insight">
+      <h3>Study time</h3>
+      <p>Calculating study-time patterns...</p>
+    </article>
+    <article class="insight">
+      <h3>Past failures</h3>
+      <p>Calculating previous-failure patterns...</p>
+    </article>
+    <article class="insight">
+      <h3>Absences</h3>
+      <p>Calculating absence patterns...</p>
+    </article>
+  </section>
+
+  <footer>
+    Dataset: UCI Student Performance, mathematics subset.
+    The grade threshold of 10/20 is used here as an analytical
+    convention. These are historical associations, not causal
+    conclusions or validated individual risk assessments.
+  </footer>
+</main>
+
+<script>
+const chartInstances = [];
+
+function createChart(id, type, labels, values, label, options = {}) {
+  const canvas = document.getElementById(id);
+  const chart = new Chart(canvas, {
+    type,
+    data: {
+      labels,
+      datasets: [{
+        label,
+        data: values,
+        backgroundColor: options.colors || [
+          "#6478ed", "#32a886", "#f0b44d", "#c27be1",
+          "#ed7b83", "#4ba5cf", "#8c9aab", "#9eaf58"
+        ],
+        borderColor: type === "line" ? "#6478ed" : undefined,
+        borderWidth: type === "line" ? 2 : 1,
+        tension: 0.25,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: options.legend ?? (type === "doughnut" || type === "pie") } },
+      scales: ["bar", "line"].includes(type) ? {
+        y: {
+          beginAtZero: true,
+          ...(options.max !== undefined ? { max: options.max } : {}),
+          title: { display: true, text: options.yTitle || "" }
+        },
+        x: { title: { display: true, text: options.xTitle || "" } }
+      } : {}
+    }
+  });
+  chartInstances.push(chart);
+  return chart;
+}
+
+function createScatter(id, points) {
+  const chart = new Chart(document.getElementById(id), {
+    type: "scatter",
+    data: {
+      datasets: [{
+        label: "Student records",
+        data: points,
+        backgroundColor: "#6478ed88",
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          title: { display: true, text: "Number of absences" },
+          beginAtZero: true
+        },
+        y: {
+          title: { display: true, text: "Final grade (0–20)" },
+          min: 0, max: 20
+        }
+      }
+    }
+  });
+  chartInstances.push(chart);
+}
+
+function entries(obj) {
+  return Object.entries(obj || {});
+}
+
+function addTableRow(metric, value, meaning) {
+  const row = document.createElement("tr");
+  [metric, value, meaning].forEach(text => {
+    const cell = document.createElement("td");
+    cell.textContent = text;
+    row.appendChild(cell);
+  });
+  document.getElementById("detailsTable").appendChild(row);
+}
+
+function addInsight(title, message) {
+  const article = document.createElement("article");
+  article.className = "insight";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const paragraph = document.createElement("p");
+  paragraph.textContent = message;
+  article.append(heading, paragraph);
+  document.getElementById("insights").appendChild(article);
+}
+
+async function loadDashboard() {
+  const status = document.getElementById("status");
+
+  try {
+    const response = await fetch("/api/analytics");
+    if (!response.ok) throw new Error("Analytics API returned HTTP " + response.status);
+
+    const d = await response.json();
+
+    document.getElementById("total").textContent = d.total_students;
+    document.getElementById("average").textContent = d.average_grade + " / 20";
+    document.getElementById("passRate").textContent = d.pass_rate + "%";
+    document.getElementById("below").textContent = d.below_threshold;
+    document.getElementById("median").textContent = d.median_grade + " / 20";
+    document.getElementById("highest").textContent = d.highest_grade + " / 20";
+    document.getElementById("lowest").textContent = d.lowest_grade + " / 20";
+    document.getElementById("aboveCount").textContent = d.at_or_above_threshold;
+
+    const grade = entries(d.grade_distribution);
+    createChart("gradeChart", "bar",
+      grade.map(x => x[0]), grade.map(x => x[1]),
+      "Number of students", { yTitle: "Students" });
+
+    createChart("gradePie", "doughnut",
+      grade.map(x => x[0]), grade.map(x => x[1]), "Grade range");
+
+    createChart("genderChart", "doughnut",
+      entries(d.gender_distribution).map(x => x[0] === "F" ? "Female" : "Male"),
+      entries(d.gender_distribution).map(x => x[1]), "Students");
+
+    createChart("schoolChart", "pie",
+      entries(d.school_distribution).map(x => x[0]),
+      entries(d.school_distribution).map(x => x[1]), "Students");
+
+    createChart("addressChart", "doughnut",
+      entries(d.address_distribution).map(x => x[0] === "U" ? "Urban" : "Rural"),
+      entries(d.address_distribution).map(x => x[1]), "Students");
+
+    createChart("supportChart", "doughnut",
+      entries(d.support_distribution).map(x => x[0] === "yes" ? "With support" : "Without support"),
+      entries(d.support_distribution).map(x => x[1]), "Students");
+
+    const studyLabels = {
+      "1": "Under 2 hours",
+      "2": "2–5 hours",
+      "3": "5–10 hours",
+      "4": "Over 10 hours"
+    };
+    const study = entries(d.study_time_average).sort((a,b) => Number(a[0])-Number(b[0]));
+    createChart("studyChart", "bar",
+      study.map(x => studyLabels[x[0]] || x[0]),
+      study.map(x => x[1]), "Average grade", { max: 20, yTitle: "Grade / 20" });
+
+    const failures = entries(d.failure_average).sort((a,b) => Number(a[0])-Number(b[0]));
+    createChart("failureChart", "bar",
+      failures.map(x => x[0] + (x[0] === "1" ? " failure" : " failures")),
+      failures.map(x => x[1]), "Average grade", { max: 20, yTitle: "Grade / 20" });
+
+    const mother = entries(d.mother_education_average).sort((a,b) => Number(a[0])-Number(b[0]));
+    createChart("motherChart", "line",
+      mother.map(x => x[0]), mother.map(x => x[1]),
+      "Average grade", { max: 20, xTitle: "Education level (0–4)", yTitle: "Grade / 20", legend: false });
+
+    const father = entries(d.father_education_average).sort((a,b) => Number(a[0])-Number(b[0]));
+    createChart("fatherChart", "line",
+      father.map(x => x[0]), father.map(x => x[1]),
+      "Average grade", { max: 20, xTitle: "Education level (0–4)", yTitle: "Grade / 20", legend: false });
+
+    const absence = entries(d.absence_average);
+    createChart("absenceChart", "line",
+      absence.map(x => x[0]), absence.map(x => x[1]),
+      "Average grade", { max: 20, yTitle: "Grade / 20", legend: false });
+
+    createScatter("scatterChart", d.absence_grade_scatter);
+
+    addTableRow("Average grade", d.average_grade + " / 20", "Arithmetic mean of final grades");
+    addTableRow("Median grade", d.median_grade + " / 20", "Middle grade after sorting");
+    addTableRow("Grades below 10", d.below_threshold, "Records with G3 < 10");
+    addTableRow("Grades 10 or above", d.at_or_above_threshold, "Records with G3 ≥ 10");
+    addTableRow("Pass-threshold share", d.pass_rate + "%", "Dataset share at or above 10/20");
+    addTableRow("Family support", d.family_support_distribution.yes ?? 0, "Records reporting family educational support");
+    addTableRow("Extra school support", d.support_distribution.yes ?? 0, "Records reporting extra school support");
+
+    const lowestStudy = study.reduce((a,b) => a[1] < b[1] ? a : b);
+    const highestStudy = study.reduce((a,b) => a[1] > b[1] ? a : b);
+    const failureZero = d.failure_average["0"];
+    const failureOneOrMore = Object.entries(d.failure_average)
+      .filter(x => Number(x[0]) > 0)
+      .map(x => x[1]);
+
+    addInsight(
+      "Study-time pattern",
+      study.length
+        ? "The lowest average among the displayed study-time groups is " +
+          (studyLabels[lowestStudy[0]] || lowestStudy[0]) +
+          " (" + lowestStudy[1] + "/20); the highest is " +
+          (studyLabels[highestStudy[0]] || highestStudy[0]) +
+          " (" + highestStudy[1] + "/20). This is an association, not proof of cause."
+        : "No study-time data available."
+    );
+
+    addInsight(
+      "Previous failures",
+      failureZero !== undefined && failureOneOrMore.length
+        ? "Students with zero recorded past failures averaged " + failureZero +
+          "/20. Groups with one or more failures averaged between " +
+          Math.min(...failureOneOrMore).toFixed(2) + " and " +
+          Math.max(...failureOneOrMore).toFixed(2) +
+          "/20. Small groups can make averages unstable."
+        : "Not enough failure-group data to compare."
+    );
+
+    addInsight(
+      "Absence patterns",
+      absence.length
+        ? "The chart compares mean final grades across absence ranges. Use it to identify patterns worth investigating, not to label individual students."
+        : "No absence-group data available."
+    );
+
+    status.textContent = "Dashboard loaded successfully from the dataset.";
+  } catch (error) {
+    status.textContent = "Could not load dashboard: " + error.message +
+      ". Check /api/analytics and the terminal for details.";
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

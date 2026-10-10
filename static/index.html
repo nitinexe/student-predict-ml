@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Performance AI</title>
+  
+<p>
+  <a href="/dashboard">📊 View Analytics Dashboard</a>
+</p>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      font-family: Arial, sans-serif;
+      background: #f3f5fa;
+      color: #182238;
+    }
+    main {
+      max-width: 760px;
+      margin: auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px #18223812;
+    }
+    h1 { margin-bottom: 8px; }
+    .muted { color: #64748b; line-height: 1.5; }
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 25px;
+    }
+    label { display: block; font-weight: 600; font-size: 14px; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #d6dce7;
+      border-radius: 9px;
+      background: white;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #3659d9;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    #result {
+      display: none;
+      margin-top: 22px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #eef3ff;
+    }
+    #grade { font-size: 32px; font-weight: bold; }
+    @media (max-width: 520px) {
+      .fields { grid-template-columns: 1fr; }
+      main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Student Performance AI</h1>
+  <p class="muted">
+    Enter student details to estimate their final mathematics grade.
+    This is an educational estimate, not a guaranteed result.
+  </p>
+
+  <form id="studentForm">
+    <div class="fields">
+      <label>School
+        <select name="school">
+          <option value="GP">Gabriel Pereira (GP)</option>
+          <option value="MS">Mousinho da Silveira (MS)</option>
+        </select>
+      </label>
+      <label>Sex
+        <select name="sex">
+          <option value="F">Female</option>
+          <option value="M">Male</option>
+        </select>
+      </label>
+      <label>Age
+        <input name="age" type="number" min="15" max="22" value="17" required>
+      </label>
+      <label>Home address
+        <select name="address">
+          <option value="U">Urban</option>
+          <option value="R">Rural</option>
+        </select>
+      </label>
+      <label>Family size
+        <select name="famsize">
+          <option value="GT3">More than 3</option>
+          <option value="LE3">3 or fewer</option>
+        </select>
+      </label>
+      <label>Parents' cohabitation status
+        <select name="Pstatus">
+          <option value="T">Living together</option>
+          <option value="A">Living apart</option>
+        </select>
+      </label>
+      <label>Mother's education (0–4)
+        <input name="Medu" type="number" min="0" max="4" value="3" required>
+      </label>
+      <label>Father's education (0–4)
+        <input name="Fedu" type="number" min="0" max="4" value="2" required>
+      </label>
+      <label>Mother's job
+        <select name="Mjob">
+          <option>teacher</option><option>health</option>
+          <option selected>services</option><option>at_home</option>
+          <option>other</option>
+        </select>
+      </label>
+      <label>Father's job
+        <select name="Fjob">
+          <option>teacher</option><option>health</option>
+          <option>services</option><option>at_home</option>
+          <option selected>other</option>
+        </select>
+      </label>
+      <label>Reason for choosing school
+        <select name="reason">
+          <option>home</option><option>reputation</option>
+          <option selected>course</option><option>other</option>
+        </select>
+      </label>
+      <label>Guardian
+        <select name="guardian">
+          <option>mother</option><option>father</option><option>other</option>
+        </select>
+      </label>
+      <label>Travel time (1–4)
+        <input name="traveltime" type="number" min="1" max="4" value="1" required>
+      </label>
+      <label>Weekly study time (1–4)
+        <input name="studytime" type="number" min="1" max="4" value="3" required>
+      </label>
+      <label>Past class failures (0–3)
+        <input name="failures" type="number" min="0" max="3" value="0" required>
+      </label>
+      <label>Extra school support
+        <select name="schoolsup"><option>no</option><option>yes</option></select>
+      </label>
+      <label>Family educational support
+        <select name="famsup"><option>yes</option><option>no</option></select>
+      </label>
+      <label>Paid extra classes
+        <select name="paid"><option>no</option><option>yes</option></select>
+      </label>
+      <label>Extracurricular activities
+        <select name="activities"><option>yes</option><option>no</option></select>
+      </label>
+      <label>Attended nursery school
+        <select name="nursery"><option>yes</option><option>no</option></select>
+      </label>
+      <label>Wants higher education
+        <select name="higher"><option>yes</option><option>no</option></select>
+      </label>
+      <label>Internet access at home
+        <select name="internet"><option>yes</option><option>no</option></select>
+      </label>
+      <label>In a romantic relationship
+        <select name="romantic"><option>no</option><option>yes</option></select>
+      </label>
+      <label>Family relationship quality (1–5)
+        <input name="famrel" type="number" min="1" max="5" value="4" required>
+      </label>
+      <label>Free time (1–5)
+        <input name="freetime" type="number" min="1" max="5" value="3" required>
+      </label>
+      <label>Going out with friends (1–5)
+        <input name="goout" type="number" min="1" max="5" value="3" required>
+      </label>
+      <label>Workday alcohol consumption (1–5)
+        <input name="Dalc" type="number" min="1" max="5" value="1" required>
+      </label>
+      <label>Weekend alcohol consumption (1–5)
+        <input name="Walc" type="number" min="1" max="5" value="2" required>
+      </label>
+      <label>Current health (1–5)
+        <input name="health" type="number" min="1" max="5" value="4" required>
+      </label>
+      <label>School absences
+        <input name="absences" type="number" min="0" max="100" value="2" required>
+      </label>
+    </div>
+
+    <button id="predictButton" type="submit">Predict Performance</button>
+  </form>
+
+  <section id="result" aria-live="polite">
+    <h2>Prediction result</h2>
+    <div id="grade"></div>
+    <p id="message"></p>
+    <p class="muted">The model's estimate is not a guaranteed grade.</p>
+  </section>
+</main>
+
+<script>
+  const form = document.getElementById("studentForm");
+  const button = document.getElementById("predictButton");
+  const result = document.getElementById("result");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    button.disabled = true;
+    button.textContent = "Predicting...";
+    result.style.display = "block";
+    document.getElementById("grade").textContent = "";
+    document.getElementById("message").textContent = "Contacting prediction API...";
+
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Convert number fields from strings to numbers.
+    const numericFields = [
+      "age", "Medu", "Fedu", "traveltime", "studytime",
+      "failures", "famrel", "freetime", "goout",
+      "Dalc", "Walc", "health", "absences"
+    ];
+    numericFields.forEach(key => data[key] = Number(data[key]));
+
+    try {
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(payload.detail || payload));
+      }
+
+      document.getElementById("grade").textContent =
+        `${payload.predicted_grade} / 20`;
+      document.getElementById("message").textContent =
+        payload.message;
+    } catch (error) {
+      document.getElementById("message").textContent =
+        "Could not generate prediction: " + error.message;
+    } finally {
+      button.disabled = false;
+      button.textContent = "Predict Performance";
+    }
+  });
+</script>
+</body>
+</html>
