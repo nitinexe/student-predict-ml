@@ -1,5 +1,5 @@
 
-import { Activity, ArrowLeft } from "lucide-react";
+import { Activity, ArrowLeft, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 
@@ -9,7 +9,7 @@ export default function SignupPage() {
       <header className="auth-topbar">
         <Link to="/" className="auth-brand">
           <span className="brand-icon">
-            <Activity size={21} />
+            <GraduationCap size={22} />
           </span>
           <span>
             Edu<span className="brand-accent">Predict</span>
@@ -38,7 +38,7 @@ export default function SignupPage() {
             </p>
 
             <div className="auth-side-stat">
-              <Activity size={19} />
+              <GraduationCap size={22} />
               <span>A clearer view of student performance.</span>
             </div>
           </div>

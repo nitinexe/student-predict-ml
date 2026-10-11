@@ -1,6 +1,7 @@
 
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from pathlib import Path
 from typing import Literal
@@ -28,6 +29,17 @@ app = FastAPI(
     title="Student Performance Prediction API",
     description="Predicts a student's final grade using a trained ML model.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
