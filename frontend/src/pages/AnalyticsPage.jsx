@@ -53,10 +53,24 @@ function getMarks(prediction) {
   return Number.isFinite(number) ? number : null;
 }
 
-function formatMarks(value) {
-  return value === null || value === undefined
-    ? "—"
-    : Number(value).toFixed(2).replace(/\.?0+$/, "");
+
+function formatMarks(value, marksFormat = "out-of-20") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
+  }
+
+  const marks = Number(value);
+
+  if (marksFormat === "percentage") {
+    return `${(marks * 5).toFixed(2)}%`;
+  }
+
+  return `${marks.toFixed(2)}/20`;
 }
 
 function formatDate(value, options = {}) {
@@ -105,6 +119,13 @@ function EmptyAnalytics() {
 
 export default function AnalyticsPage() {
   const { user, loading: authLoading } = useAuth();
+
+  
+const marksFormat =
+  user?.user_metadata?.edupredict_settings?.preferences?.marksFormat ===
+  "percentage"
+    ? "percentage"
+    : "out-of-20";
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [predictions, setPredictions] = useState([]);
@@ -387,21 +408,22 @@ export default function AnalyticsPage() {
                     />
                     <MetricCard
                       icon={Target}
-                      label="Average predicted marks"
-                      value={formatMarks(stats.average)}
-                      helper="Out of 20"
+                      label="Average prediction"
+                      value={formatMarks(stats.average, marksFormat)}
+                      helper={marksFormat === "percentage" ? "Percentage" : "Out of 20"}
+                      
                     />
                     <MetricCard
                       icon={TrendingUp}
                       label="Highest prediction"
-                      value={formatMarks(stats.highest)}
-                      helper="In selected period"
+                      value={formatMarks(stats.highest, marksFormat)}
+                      helper={marksFormat === "percentage" ? "Percentage" : "Out of 20"}
                     />
                     <MetricCard
                       icon={GraduationCap}
                       label="Latest prediction"
-                      value={formatMarks(stats.latest)}
-                      helper="Out of 20"
+                      value={formatMarks(stats.latest, marksFormat)}
+                      helper={marksFormat === "percentage" ? "Percentage" : "Out of 20"}
                     />
                   </section>
 

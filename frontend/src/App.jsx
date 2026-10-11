@@ -12,6 +12,7 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import StudentProfilePage from "./pages/StudentProfilePage.jsx";
 import AnalyticsPage from "./pages/AnalyticsPage.jsx";
 import PredictionHistoryPage from "./pages/PredictionHistoryPage.jsx";
+import SettingsPage from "./pages/SettingsPage.jsx";
 
 function PublicOnlyRoute({ children }) {
   const { user, loading } = useAuth();
@@ -40,6 +41,7 @@ return (
 <Route path="/profile" element={<StudentProfilePage />} />
 <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
 <Route path="/dashboard/history" element={<PredictionHistoryPage />} />
+<Route path="/dashboard/settings" element={<SettingsPage />} />
 </Routes>
 );
 }
