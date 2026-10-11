@@ -11,6 +11,9 @@ import {
   UserRound,
   X,
   BrainCircuit,
+  ClipboardCheck,
+  BookOpenCheck,
+  MessageCircle,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./DashboardSidebar.css";
@@ -18,6 +21,9 @@ import "./DashboardSidebar.css";
 const navigation = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Predict Performance", to: "/predict", icon: BrainCircuit },
+  { label: "Weekly tests", to: "/dashboard/tests", icon: ClipboardCheck },
+  { label: "Preparation track", to: "/dashboard/study-plan", icon: BookOpenCheck },
+  { label: "AI Coach", to: "/dashboard/coach", icon: MessageCircle },
   { label: "Analytics", to: "/dashboard/analytics", icon: ChartNoAxesCombined },
   { label: "Prediction History", to: "/dashboard/history", icon: History },
   { label: "My Student Profile", to: "/profile", icon: GraduationCap },
