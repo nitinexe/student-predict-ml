@@ -4,7 +4,7 @@ import { useAuth } from "./context/AuthContext";
 
 import LandingPage from "./pages/LandingPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
-import SignupPage from "./pages/SignupPage.jsx";
+import SignupPage from "./pages/signupPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PredictionPage from "./pages/PredictionPage.jsx";
