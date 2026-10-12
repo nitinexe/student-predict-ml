@@ -13,9 +13,7 @@ import StudentProfilePage from "./pages/StudentProfilePage.jsx";
 import AnalyticsPage from "./pages/AnalyticsPage.jsx";
 import PredictionHistoryPage from "./pages/PredictionHistoryPage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
-import WeeklyTestsPage from "./pages/WeeklyTestsPage.jsx";
-import StudyPlanPage from "./pages/StudyPlanPage.jsx";
-import AICoachPage from "./pages/AICoachPage.jsx";
+import CoursesPage from "./pages/CoursesPage.jsx";
 
 function PublicOnlyRoute({ children }) {
   const { user, loading } = useAuth();
@@ -45,9 +43,7 @@ return (
 <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
 <Route path="/dashboard/history" element={<PredictionHistoryPage />} />
 <Route path="/dashboard/settings" element={<SettingsPage />} />
-<Route path="/dashboard/tests" element={<WeeklyTestsPage />} />
-<Route path="/dashboard/study-plan" element={<StudyPlanPage />} />
-<Route path="/dashboard/coach" element={<AICoachPage />} />
+<Route path="/dashboard/courses" element={<CoursesPage />} />
 </Routes>
 );
 }
