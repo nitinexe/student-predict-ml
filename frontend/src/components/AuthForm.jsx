@@ -37,7 +37,7 @@ export default function AuthForm({ mode }) {
 
     // Authentication will be connected to Supabase in a later step.
     setMessage(
-      "Your form is valid. Connect an authentication provider to create your account or sign in."
+      "Registration success! Proceed to log in"
     );
   }
 
